@@ -1,0 +1,14 @@
+# Mynah Tier 0 Rule-Based Router pattern table
+# Map regex patterns to tools
+
+- pattern: "open (.+)"
+  tool: apps.launch
+  args: {name: "$1"}
+
+- pattern: "(note|remember) (that )?(.+)"
+  tool: vault.append
+  args: {text: "$3"}
+
+- pattern: "work mode"
+  tool: focus.activate
+  args: {profile: "work"}
