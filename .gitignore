@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Environments
+.venv/
+venv/
+ENV/
+env/
+
+# macOS system files
+.DS_Store
+
+# Databases and Local logs
+*.db
+*.log
+audit.db
+
+# Model weights
+models/
+
+# Personal Vault files (to prevent leaking personal notes)
+vault/
+quarantine/
