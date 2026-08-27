@@ -115,7 +115,7 @@ The differentiator is not capability. It is that **the memory compounds and the 
 ### Accepted limitations
 - Applications with no scripting interface and no accessibility tree cannot be controlled. Roughly 10% of software, not worth solving.
 - The local model will be wrong about niche facts. Anything needing current information or deep reasoning escalates.
-- An 8B model is reliable on single tool calls and shaky on multi-step chains. Design around single-step commands; let chains escalate.
+- An 1.5B/3B model is reliable on single tool calls and shaky on multi-step chains. Design around single-step commands; let chains escalate.
 
 ---
 
@@ -150,9 +150,9 @@ Time is the real cost: roughly 80 hours to v1.0, spread over nine weeks of eveni
 
 ### Running
 
-Local requests cost nothing. With an 8B model handling most reasoning, expect roughly 95% of requests to stay on-device.
+Local requests cost nothing. With a 1.5B/3B model handling most reasoning, expect roughly 95% of requests to stay on-device.
 
-Rates as of August 2026: Haiku 4.5 at $1/$5 per million input/output tokens, Sonnet 5 at $2/$10, Opus 5 at $5/$25. Prompt caching cuts repeated input cost by 90%.
+Rates as of August 2026: gpt-4o-mini at $0.15/$0.60 per million input/output tokens. Prompt caching cuts repeated input cost by 90%.
 
 | Scenario | Cloud calls/day | Monthly |
 |---|---|---|

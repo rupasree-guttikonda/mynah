@@ -156,7 +156,7 @@ graph TD
 
 #### Week 3 Tasks (4.5 hours per person)
 * **Dev A Tasks (Systems):**
-  1. Install Ollama and pull `qwen2.5:8b-instruct-q4_K_M`. Benchmark its token-generation speed (tokens/sec) and monitor system RAM footprint on battery vs. wall power.
+  1. Install Ollama and pull `qwen2.5:1.5b-instruct-q4_K_M`. Benchmark its token-generation speed (tokens/sec) and monitor system RAM footprint on battery vs. wall power.
   2. Set up the local model tool-calling prompt infrastructure.
 * **Dev B Tasks (Brain):**
   1. Write structured JSON schemas for every registered tool.
@@ -166,7 +166,7 @@ graph TD
 #### Week 4 Tasks (4.5 hours per person)
 * **Dev A Tasks (Systems):**
   1. **Spike: Apple Foundation Models (Swift Bridge).** Build a tiny Swift CLI helper that routes commands using the system-native model framework. Benchmark performance and accuracy.
-  2. Compare RAM overhead: does the Swift framework save the 5GB RAM footprint of Qwen? Document the final decision.
+  2. Compare RAM overhead: does the Swift framework save the 1.1GB RAM footprint of Qwen? Document the final decision.
 * **Dev B Tasks (Brain):**
   1. Set up context injectors: pull the active workspace status, active app window title, identity blocks (`me/`), and the last 2 conversation turns.
   2. Implement lazy-loading: load the local LLM only when Tier 0 fails, and unload after 5 minutes of inactivity to reclaim system memory.
@@ -178,7 +178,7 @@ graph TD
 ---
 
 ### v0.4 — Escalation and Guardrails (Week 5)
-*Goal: Escalate complex queries to Claude safely while keeping costs strictly controlled.*
+*Goal: Escalate complex queries to ChatGPT safely while keeping costs strictly controlled.*
 
 #### Weekly Tasks (4.5 hours per person)
 * **Dev A Tasks (Systems):**
@@ -186,13 +186,13 @@ graph TD
   2. Write middleware that intercepts outgoing router calls to check the daily spend limit.
   3. Integrate performance measurement: track latencies of the STT, Router, and Execution steps, and save them in the SQLite `turns` table.
 * **Dev B Tasks (Brain):**
-  1. Integrate the Anthropic Claude API client. Implement prompt caching for the tool schemas to minimize cost.
-  2. Write the routing rules: trigger Claude (Tier 2) only on explicit knowledge queries or if the local model returns low confidence.
+  1. Integrate the OpenAI ChatGPT API client (using `gpt-4o-mini`). Implement structured output formatting to minimize cost.
+  2. Write the routing rules: trigger gpt-4o-mini (Tier 2) only on explicit knowledge queries or if the local model returns low confidence.
   3. Build the token limit checker: reject and speak a refusal warning if an input payload exceeds 8,000 tokens.
 
 #### Integration & Verification (Weekend Sync - 2 hours)
 * **Verification:** Speak: *"Who is the current prime minister of the UK?"*. 
-  * *Verification steps:* Verify it escalates to Claude. Open the SQLite database and confirm the transaction cost is logged.
+  * *Verification steps:* Verify it escalates to gpt-4o-mini. Open the SQLite database and confirm the transaction cost is logged.
 * **Ceiling Test:** Set the daily cost limit to `$0.01` in your configuration. Speak: *"Compare Python and Go"*. Confirm the system refuses to run the query and speaks the refusal warning.
 
 ---
