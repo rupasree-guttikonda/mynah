@@ -27,7 +27,12 @@ def get_system_ram_gb() -> float:
 
 def get_default_local_model() -> str:
     """
-    Returns the single default local model configured for the project.
-    - Default local model: Qwen 3.5 4B (qwen3.5:4b)
+    Selects default local model based on total detected system RAM.
+    - <= 8.5 GB RAM: qwen3:1.7b
+    - > 8.5 GB RAM: qwen3.5:4b
     """
-    return "qwen3.5:4b"
+    ram_gb = get_system_ram_gb()
+    if ram_gb <= 8.5:
+        return "qwen3:1.7b"
+    else:
+        return "qwen3.5:4b"

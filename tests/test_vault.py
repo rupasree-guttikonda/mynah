@@ -101,7 +101,10 @@ class TestConfig(unittest.TestCase):
         self.assertGreater(ram, 0.0)
         
         model = get_default_local_model()
-        self.assertEqual(model, "qwen3.5:4b")
+        if ram <= 8.5:
+            self.assertEqual(model, "qwen3:1.7b")
+        else:
+            self.assertEqual(model, "qwen3.5:4b")
 
 if __name__ == "__main__":
     unittest.main()
