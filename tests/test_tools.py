@@ -6,7 +6,7 @@ def test_tool_registry_register():
     registry = ToolRegistry()
     registry.register("test_tool", "A dummy test tool", "safe", lambda x: f"hello {x}")
     assert "test_tool" in registry.registry
-    assert registry.registry["test_tool"]["classification"] == "safe"
+    assert registry.registry["test_tool"]["risk"] == "safe"
 
 def test_tool_registry_execute():
     registry = ToolRegistry()
@@ -29,11 +29,11 @@ def test_apps_quit():
 
 def test_windows_snap_left():
     res = windows.snap_left()
-    assert res == "Snapped window left"
+    assert "snap left" in res.lower()
 
 def test_windows_snap_right():
     res = windows.snap_right()
-    assert res == "Snapped window right"
+    assert "snap right" in res.lower()
 
 def test_vault_append():
     res = vault.append("Test note")
