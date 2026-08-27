@@ -1,0 +1,154 @@
+# eval/routing.yaml
+# Mynah router evaluation set - 30+ examples to verify tier mapping and tool correctness
+
+- text: "open safari"
+  tier: 0
+  tool: "apps.launch"
+  args:
+    name: "Safari"
+
+- text: "open Calculator"
+  tier: 0
+  tool: "apps.launch"
+  args:
+    name: "Calculator"
+
+- text: "quit Slack"
+  tier: 0
+  tool: "apps.quit"
+  args:
+    name: "Slack"
+
+- text: "remember that I need to buy milk"
+  tier: 0
+  tool: "vault.append"
+  args:
+    text: "I need to buy milk"
+
+- text: "note that the deployment was successful"
+  tier: 0
+  tool: "vault.append"
+  args:
+    text: "the deployment was successful"
+
+- text: "mute system sound"
+  tier: 0
+  tool: "windows.mute"
+
+- text: "unmute"
+  tier: 0
+  tool: "windows.unmute"
+
+- text: "what time is it"
+  tier: 2
+  tool: "windows.get_time"
+
+- text: "set volume to 50"
+  tier: 0
+  tool: "windows.set_volume"
+  args:
+    level: 50
+
+- text: "snap this window left"
+  tier: 0
+  tool: "windows.snap_left"
+
+- text: "snap it right"
+  tier: 0
+  tool: "windows.snap_right"
+
+- text: "can you launch the safari browser please?"
+  tier: 1
+  tool: "apps.launch"
+  args:
+    name: "Safari"
+
+- text: "please shut down calculator"
+  tier: 1
+  tool: "apps.quit"
+  args:
+    name: "Calculator"
+
+- text: "adjust output volume level to eighty-five percent"
+  tier: 1
+  tool: "windows.set_volume"
+  args:
+    level: 85
+
+- text: "silence system audio output"
+  tier: 1
+  tool: "windows.mute"
+
+- text: "turn on the sound again"
+  tier: 1
+  tool: "windows.unmute"
+
+- text: "what is the current time of day?"
+  tier: 2
+  tool: "windows.get_time"
+
+- text: "move the current app window to the left boundary"
+  tier: 1
+  tool: "windows.snap_left"
+
+- text: "dock this application on the right side of the screen"
+  tier: 1
+  tool: "windows.snap_right"
+
+- text: "save a memo saying that the key is stored in vault"
+  tier: 1
+  tool: "vault.append"
+  args:
+    text: "the key is stored in vault"
+
+- text: "search vault for data engineering project notes"
+  tier: 1
+  tool: "vault.search"
+  args:
+    query: "data engineering"
+
+- text: "find notes containing SQLite turns logger"
+  tier: 1
+  tool: "vault.search"
+  args:
+    query: "SQLite turns logger"
+
+- text: "delete my critical file at /Users/avr/temp.txt"
+  tier: 1
+  tool: "systems.delete_file"
+  args:
+    path: "/Users/avr/temp.txt"
+
+- text: "permanently remove the data log at /tmp/audit.log"
+  tier: 1
+  tool: "systems.delete_file"
+  args:
+    path: "/tmp/audit.log"
+
+- text: "what is the capital of the united kingdom?"
+  tier: 2
+  tool: null
+
+- text: "why is my python script getting shadowing errors?"
+  tier: 2
+  tool: null
+
+- text: "how does openwakeword detect custom phrases?"
+  tier: 2
+  tool: null
+
+- text: "who wrote the first computer compiler?"
+  tier: 2
+  tool: null
+
+- text: "explain the difference between postgreSQL and sqlite"
+  tier: 2
+  tool: null
+
+- text: "when was the macbook air m3 released?"
+  tier: 2
+  tool: null
+
+- text: "tell me a funny programming joke"
+  tier: 2
+  tool: null

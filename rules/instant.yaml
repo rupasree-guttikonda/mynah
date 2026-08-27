@@ -5,9 +5,33 @@
   tool: apps.launch
   args: {name: "$1"}
 
+- pattern: "quit (.+)"
+  tool: apps.quit
+  args: {name: "$1"}
+
 - pattern: "(note|remember) (that )?(.+)"
   tool: vault.append
   args: {text: "$3"}
+
+- pattern: "set volume to (\\d+)"
+  tool: windows.set_volume
+  args: {level: "$1"}
+
+- pattern: "mute system sound"
+  tool: windows.mute
+
+- pattern: "unmute"
+  tool: windows.unmute
+
+- pattern: "snap this window left"
+  tool: windows.snap_left
+
+- pattern: "snap it right"
+  tool: windows.snap_right
+
+- pattern: "delete file (.+)"
+  tool: systems.delete_file
+  args: {path: "$1"}
 
 - pattern: "work mode"
   tool: focus.activate

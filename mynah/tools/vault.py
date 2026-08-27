@@ -70,3 +70,51 @@ status: quarantined
     except Exception as e:
         return f"Failed to save quarantined content: {str(e)}"
 
+def search(query: str) -> str:
+    """
+    Searches all markdown files in the vault (excluding quarantine) for the query,
+    ranking matching files by recency (modification time).
+    """
+    matches = []
+    
+    # Traverse vault directory
+    for root, dirs, files in os.walk(VAULT_DIR):
+        # Exclude quarantine boundary files completely from search results
+        if "quarantine" in root:
+            continue
+        for file in files:
+            if file.endswith(".md"):
+                file_path = os.path.join(root, file)
+                try:
+                    with open(file_path, "r", encoding="utf-8") as f:
+                        lines = f.readlines()
+                    matching_lines = []
+                    for line_num, line in enumerate(lines, 1):
+                        if query.lower() in line.lower():
+                            matching_lines.append(f"Line {line_num}: {line.strip()}")
+                    if matching_lines:
+                        mtime = os.path.getmtime(file_path)
+                        matches.append({
+                            "file": os.path.relpath(file_path, VAULT_DIR),
+                            "mtime": mtime,
+                            "snippets": matching_lines[:3] # top 3 matching snippets
+                        })
+                except Exception:
+                    continue
+                    
+    if not matches:
+        return f"No matches found for search query: '{query}'"
+        
+    # Sort matches by modification time (recency) first
+    matches.sort(key=lambda x: x["mtime"], reverse=True)
+    
+    # Format top 5 results for speech and text output
+    result_lines = []
+    for m in matches[:5]:
+        dt_str = datetime.datetime.fromtimestamp(m["mtime"]).strftime("%Y-%m-%d %H:%M:%S")
+        snippet_text = "\n  ".join(m["snippets"])
+        result_lines.append(f"- **{m['file']}** (Last updated: {dt_str}):\n  {snippet_text}")
+        
+    return "Search results:\n" + "\n".join(result_lines)
+
+
