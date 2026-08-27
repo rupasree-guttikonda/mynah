@@ -170,7 +170,7 @@ mynah/
 │   └── instant.yaml    the Tier 0 pattern table
 ├── models/
 ├── tests/
-└── mynah.py
+└── run.py
 ```
 
 The four components an external agent framework would have replaced — tool registry, vault I/O, scheduler, cloud client — total roughly 350 lines. That is the price of full control over the hot path, and it is worth paying.

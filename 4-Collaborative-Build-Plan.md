@@ -126,7 +126,7 @@ graph TD
 
 #### Integration & Verification (Weekend Sync - 2 hours)
 * Merge both branches. 
-* **Verification:** Run `mynah.py`. Say *"Mynah, open Slack"*.
+* **Verification:** Run `run.py`. Say *"Mynah, open Slack"*.
   * *Verification steps:* Does it wake up? Does it transcribe correctly? Does Terminal launch within 1 second? Check the SQLite file to confirm a row is added to the `turns` table.
 
 ---

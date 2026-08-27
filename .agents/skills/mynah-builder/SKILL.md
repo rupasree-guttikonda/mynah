@@ -18,7 +18,7 @@ When writing new modules, follow this layout:
 - `mynah/safety/`: confirmation gate, budget/token limits, kill switch
 - `mynah/log/`: SQLite audit logs
 - `rules/instant.yaml`: regex rules for Tier 0
-- `mynah.py`: Main process thread loop
+- `run.py`: Main process thread loop
 
 ---
 
@@ -31,7 +31,7 @@ python -m unittest tests/test_router.py
 ```
 Or write a simple mock shell command:
 ```bash
-python mynah.py --mock-text "open Slack"
+python run.py --mock-text "open Slack"
 ```
 
 ### 2. SQLite Metrics Verification
