@@ -1,0 +1,19 @@
+# Core dependencies for Mynah Voice Assistant
+
+# Systems & Audio (Dev A)
+sounddevice
+mlx-whisper
+openwakeword
+numpy
+
+# macOS Integration
+pyobjc-core>=11.0
+pyobjc-framework-AVFoundation>=11.0
+pyobjc
+
+# Brain, Router & LLMs (Dev B)
+ollama
+anthropic
+tiktoken
+pydantic
+pyyaml

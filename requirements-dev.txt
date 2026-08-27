@@ -1,0 +1,6 @@
+# Development & Testing dependencies for Mynah
+
+pytest
+pytest-asyncio
+ruff
+mypy
