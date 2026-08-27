@@ -9,11 +9,12 @@ numpy
 # macOS Integration
 pyobjc-core>=11.0
 pyobjc-framework-AVFoundation>=11.0
-pyobjc
+pyobjc>=10.0
 
 # Brain, Router & LLMs (Dev B)
 ollama
 anthropic
-tiktoken
+openai>=1.0.0
+tiktoken>=0.5.0
 pydantic
-pyyaml
+PyYAML>=6.0

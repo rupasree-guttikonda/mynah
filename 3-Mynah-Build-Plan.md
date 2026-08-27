@@ -83,7 +83,7 @@ You are not evaluating whether to adopt them. The architecture decision is made:
 
 | Day | Task | Hours |
 |---|---|---|
-| 1 | Ollama, pull Qwen3 8B Q4_K_M, benchmark tokens/sec and RAM | 2 |
+| 1 | Ollama, pull Qwen2.5 1.5B Q4_K_M, benchmark tokens/sec and RAM | 2 |
 | 2 | Tool schema definition, JSON contract, error handling | 2.5 |
 | 3 | Constrained decoding via Ollama tools API or GBNF grammar | 3 |
 | 4 | Router: rules first, model on miss, confidence scoring | 2.5 |
@@ -97,11 +97,11 @@ You are not evaluating whether to adopt them. The architecture decision is made:
 | 3 | **Spike: Apple Foundation Models.** Swift bridge, benchmark against Qwen3 on 50 routing examples | 3 |
 | 4 | Decide from the numbers; document the decision | 1 |
 
-**On the spike:** if Apple FM wins, routing moves to it, the 8B becomes lazy-loaded for real work only, and you free ~5GB at rest. If it loses, you've spent three hours and closed the question permanently. Either outcome is worth it.
+**On the spike:** if Apple FM wins, routing moves to it, the 1.5B becomes lazy-loaded for real work only, and you free ~1.1GB at rest. If it loses, you've spent three hours and closed the question permanently. Either outcome is worth it.
 
 **Definition of done:** you phrase a command three different ways and all three work.
 
-**Known limitation to accept:** an 8B is reliable on single tool calls, shaky on multi-step chains. Community guidance for reliable multi-step tool use is 14B+, which you cannot fit. Design around single-step commands; let chains escalate.
+**Known limitation to accept:** a 1.5B/3B is reliable on single tool calls, shaky on multi-step chains. Design around single-step commands; let chains escalate.
 
 ---
 
@@ -111,8 +111,8 @@ You are not evaluating whether to adopt them. The architecture decision is made:
 
 | Day | Task | Hours |
 |---|---|---|
-| 1 | Claude API client, Haiku default, prompt caching on system prompt and schemas | 2 |
-| 2 | Confidence-based routing, Sonnet escalation on low confidence | 2 |
+| 1 | OpenAI API client, gpt-4o-mini default, schema definitions | 2 |
+| 2 | Confidence-based routing, gpt-4o-mini escalation on low confidence | 2 |
 | 3 | Hard token cap per request (8,000), enforced before the call | 1.5 |
 | 4 | Daily spend ceiling ($1) queried from the audit log, spoken refusal at limit | 2 |
 | 5 | Cost and latency columns wired into every log row | 1.5 |
@@ -140,7 +140,7 @@ You are not evaluating whether to adopt them. The architecture decision is made:
 |---|---|---|
 | 1 | Clipboard read tool, selection capture | 1.5 |
 | 2 | Clipboard actions: explain, summarize, rewrite, translate | 3 |
-| 3 | Route clipboard work to local 8B by default, cloud on length or complexity | 2 |
+| 3 | Route clipboard work to local 1.5B/3B by default, cloud on length or complexity | 2 |
 | 4 | Learning tools: quiz me from my notes, summarize what I learned this month | 2.5 |
 
 **The clipboard is what replaces screen control.** Select anything in any app, speak, act on it. No perception problem, no token cost of a full page, no injection surface, works in apps with no accessibility tree. Ninety percent of what screen control promised at five percent of the complexity.

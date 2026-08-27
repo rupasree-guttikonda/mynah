@@ -1,6 +1,7 @@
 # Development & Testing dependencies for Mynah
 
-pytest
+-r requirements.txt
+pytest>=7.0.0
 pytest-asyncio
 ruff
 mypy

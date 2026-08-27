@@ -23,12 +23,12 @@ Everything below runs in a single Python process. No IPC, no second runtime, no 
                       └──┬────┬────┬─┘
               ┌──────────┘    │    └──────────┐
               ▼               ▼               ▼
-      ┌───────────────┐ ┌───────────┐ ┌──────────────┐
-      │    Tier 0     │ │  Tier 1   │ │   Tier 2     │
-      │ pattern match │ │ local 8B  │ │  cloud API   │
-      │  no model     │ │ tool call │ │  escalation  │
-      │  ~70%         │ │  ~25%     │ │   ~5%        │
-      └───────┬───────┘ └─────┬─────┘ └──────┬───────┘
+       ┌───────────────┐ ┌───────────┐ ┌──────────────┐
+       │    Tier 0     │ │  Tier 1   │ │   Tier 2     │
+       │ pattern match │ │ local 1.5B│ │  cloud API   │
+       │  no model     │ │ tool call │ │  escalation  │
+       │  ~70%         │ │  ~25%     │ │   ~5%        │
+       └───────┬───────┘ └─────┬─────┘ └──────┬───────┘
               └───────────────┼──────────────┘
                               ▼
                     ┌──────────────────┐
@@ -85,7 +85,7 @@ Use grammar-constrained decoding (GBNF in llama.cpp, or Ollama's native tools AP
 ### Tier 2 — cloud
 Triggered by: explicit knowledge questions, low local confidence, requests needing current information, or long-context synthesis.
 
-- Haiku by default, Sonnet on low confidence
+- gpt-4o-mini by default with structured tool-calling
 - Cache the system prompt and tool schemas; byte-identical every call
 - Stream the response
 - Hard cap at 8,000 tokens per request
@@ -108,11 +108,11 @@ Triggered by: explicit knowledge questions, low local confidence, requests needi
 
 | Technology | Role | Footprint | Why |
 |---|---|---|---|
-| Qwen3 8B Q4_K_M | Local reasoning and tool calling | 5GB | Native tool-call tokens, strong structured output |
-| Qwen3 4B Q4 | Fallback under memory pressure | 2.5GB | Same family, half the size |
-| Ollama or MLX | Inference runtime | — | Ollama for the tools API, MLX for raw Apple Silicon speed |
+| Qwen2.5 1.5B Q4_K_M | Local reasoning and tool calling | 1.1GB | Extremely small RAM footprint, fast inference |
+| Llama3.2 3B or 1B | Fallback / alternative model | 1.5-2.2GB | Highly efficient, leaves most RAM free |
+| Ollama or MLX | Inference runtime | — | Ollama for structured JSON tools, MLX for raw Apple Silicon speed |
 | GBNF grammars | Constrained decoding | — | Schema-valid JSON guaranteed at token level |
-| Claude API | Escalation | ~$1–3/mo | Haiku default, Sonnet on low confidence |
+| OpenAI API | Escalation | ~$0.10–0.50/mo | gpt-4o-mini, cheap and fast |
 
 **Quantisation floor: Q4_K_M.** Q3 and Q2 degrade tool-call reliability before conversational quality, so the model keeps sounding fine while silently producing malformed JSON.
 
@@ -143,7 +143,7 @@ Triggered by: explicit knowledge questions, low local confidence, requests needi
 | macOS Keychain | Secrets | Never markdown, never in the vault |
 | launchd | Process supervision and scheduling | System-native, survives reboot |
 
-**Resident memory: ~5.6GB** with the 8B loaded, **~1GB** at rest if lazy-loading is used. Leaves comfortable headroom on 16GB.
+**Resident memory: ~1.5GB** with the 1.5B loaded, **~0.1GB** at rest if lazy-loading is used. Leaves comfortable headroom on 8GB.
 
 ---
 
@@ -170,7 +170,7 @@ mynah/
 │   └── instant.yaml    the Tier 0 pattern table
 ├── models/
 ├── tests/
-└── mynah.py
+└── run.py
 ```
 
 The four components an external agent framework would have replaced — tool registry, vault I/O, scheduler, cloud client — total roughly 350 lines. That is the price of full control over the hot path, and it is worth paying.
