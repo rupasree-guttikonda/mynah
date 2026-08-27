@@ -14,6 +14,7 @@ from mynah.tools.base import ToolRegistry
 import mynah.tools.apps as apps
 import mynah.tools.windows as windows
 import mynah.tools.vault as vault
+import mynah.tools.keychain as keychain
 
 from mynah.router.rules import RuleRouter
 from mynah.memory.context import get_active_context
@@ -141,14 +142,80 @@ def setup_registry() -> ToolRegistry:
             "required": ["path"]
         }
     )
+    # keychain.set_secret
+    registry.register(
+        "keychain.set_secret",
+        "Saves a password or token securely in the macOS Keychain. WARNING: This action is irreversible.",
+        "irreversible",
+        keychain.set_secret,
+        {
+            "type": "object",
+            "properties": {
+                "service": {
+                    "type": "string",
+                    "description": "The service name for the secret."
+                },
+                "account": {
+                    "type": "string",
+                    "description": "The account name for the secret."
+                },
+                "secret": {
+                    "type": "string",
+                    "description": "The secret password or token value."
+                }
+            },
+            "required": ["service", "account", "secret"]
+        }
+    )
+    
+    # keychain.get_secret
+    registry.register(
+        "keychain.get_secret",
+        "Retrieves a secret password or token from the macOS Keychain.",
+        "safe",
+        keychain.get_secret,
+        {
+            "type": "object",
+            "properties": {
+                "service": {
+                    "type": "string",
+                    "description": "The service name of the secret."
+                },
+                "account": {
+                    "type": "string",
+                    "description": "The account name of the secret."
+                }
+            },
+            "required": ["service", "account"]
+        }
+    )
     
     return registry
 
 def is_question_pattern(text: str) -> bool:
-    """Detects if a prompt begins with question words to route directly to cloud."""
+    """
+    Detects if a prompt is a general knowledge question that should bypass Tier 1.
+    If the prompt contains keywords related to registered tools, it is treated as a command
+    and NOT bypassed, so the local model can handle it.
+    """
     words = ["what", "why", "how", "explain", "who", "when", "can you explain"]
     cleaned = text.lower().strip()
-    return any(cleaned.startswith(w) for w in words)
+    
+    # If it doesn't start with any question word, it's not a question bypass
+    if not any(cleaned.startswith(w) for w in words):
+        return False
+        
+    # If it contains tool command keywords, let it go to Tier 0 / Tier 1 instead of bypassing
+    tool_keywords = [
+        "time", "volume", "mute", "unmute", "snap", "window", "open", 
+        "launch", "quit", "close", "note", "remember", "search", "find", 
+        "delete", "file", "calendar", "keychain", "secret", "password",
+        "wrote", "write", "key"
+    ]
+    if any(keyword in cleaned for keyword in tool_keywords):
+        return False
+        
+    return True
 
 def route_and_execute(text: str, registry: ToolRegistry, router: RuleRouter) -> dict:
     """

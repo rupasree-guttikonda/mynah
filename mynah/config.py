@@ -27,12 +27,7 @@ def get_system_ram_gb() -> float:
 
 def get_default_local_model() -> str:
     """
-    Selects default local model based on total detected system RAM.
-    - <= 8.5 GB RAM: Qwen 2.5 1.5B (low memory footprint, ~1.1GB RAM)
-    - > 8.5 GB RAM: Qwen 3.5 4B (headroom tier, ~2.8GB RAM)
+    Returns the single default local model configured for the project.
+    - Default local model: Qwen 3.5 4B (qwen3.5:4b)
     """
-    ram_gb = get_system_ram_gb()
-    if ram_gb <= 8.5:
-        return "qwen2.5:1.5b-instruct"
-    else:
-        return "qwen3.5:4b"
+    return "qwen3.5:4b"

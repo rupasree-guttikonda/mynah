@@ -33,6 +33,9 @@
   tool: systems.delete_file
   args: {path: "$1"}
 
+- pattern: "what time is it"
+  tool: windows.get_time
+
 - pattern: "work mode"
   tool: focus.activate
   args: {profile: "work"}
