@@ -104,7 +104,7 @@ class TestConfig(unittest.TestCase):
         if ram <= 8.5:
             self.assertEqual(model, "qwen2.5:1.5b-instruct")
         else:
-            self.assertEqual(model, "qwen2.5:3b-instruct")
+            self.assertEqual(model, "qwen3.5:4b")
 
 if __name__ == "__main__":
     unittest.main()
