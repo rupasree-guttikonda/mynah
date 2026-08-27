@@ -6,7 +6,8 @@ Vault operations tools (note capturing, search, recall).
 import os
 import datetime
 
-VAULT_DIR = "vault"
+from mynah.config import VAULT_DIR
+
 DAILY_DIR = os.path.join(VAULT_DIR, "daily")
 
 def append(text: str) -> str:

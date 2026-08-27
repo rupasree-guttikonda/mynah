@@ -94,5 +94,17 @@ class TestResponseFormatter(unittest.TestCase):
         res = format_spoken_response("hello world")
         self.assertEqual(res, "hello world")
 
+class TestConfig(unittest.TestCase):
+    def test_ram_detection(self):
+        from mynah.config import get_system_ram_gb, get_default_local_model
+        ram = get_system_ram_gb()
+        self.assertGreater(ram, 0.0)
+        
+        model = get_default_local_model()
+        if ram <= 8.5:
+            self.assertEqual(model, "qwen2.5:1.5b-instruct")
+        else:
+            self.assertEqual(model, "qwen2.5:3b-instruct")
+
 if __name__ == "__main__":
     unittest.main()
