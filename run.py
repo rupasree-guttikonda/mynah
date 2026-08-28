@@ -15,6 +15,8 @@ import mynah.tools.apps as apps
 import mynah.tools.windows as windows
 import mynah.tools.vault as vault
 import mynah.tools.keychain as keychain
+import mynah.tools.clipboard as clipboard
+import mynah.memory.review as review
 
 from mynah.router.rules import RuleRouter
 from mynah.memory.context import get_active_context
@@ -191,6 +193,56 @@ def setup_registry() -> ToolRegistry:
         }
     )
     
+    # clipboard.explain_code
+    registry.register(
+        "clipboard.explain_code",
+        "Reads code from clipboard and explains its purpose and logic.",
+        "safe",
+        clipboard.explain_code
+    )
+    
+    # clipboard.summarize_text
+    registry.register(
+        "clipboard.summarize_text",
+        "Reads text from clipboard and summarizes it.",
+        "safe",
+        clipboard.summarize_text
+    )
+    
+    # clipboard.translate_selection
+    registry.register(
+        "clipboard.translate_selection",
+        "Reads text from clipboard and translates it to target language.",
+        "safe",
+        clipboard.translate_selection,
+        {
+            "type": "object",
+            "properties": {
+                "target_language": {
+                    "type": "string",
+                    "description": "The target language to translate the text to (e.g. Spanish, German, French)."
+                }
+            },
+            "required": ["target_language"]
+        }
+    )
+    
+    # memory.quiz_me
+    registry.register(
+        "memory.quiz_me",
+        "Picks a random note from the daily logs or profile and generates a memory quiz question.",
+        "safe",
+        review.quiz_me
+    )
+    
+    # memory.summarize_month
+    registry.register(
+        "memory.summarize_month",
+        "Aggregates and summarizes all daily logs from the past month.",
+        "safe",
+        review.summarize_month
+    )
+    
     return registry
 
 def is_question_pattern(text: str) -> bool:
@@ -211,7 +263,8 @@ def is_question_pattern(text: str) -> bool:
         "time", "volume", "mute", "unmute", "snap", "window", "open", 
         "launch", "quit", "close", "note", "remember", "search", "find", 
         "delete", "file", "calendar", "keychain", "secret", "password",
-        "wrote", "write", "key"
+        "wrote", "write", "key", "clipboard", "code", "selection", "quiz",
+        "month", "summarize", "translate"
     ]
     if any(keyword in cleaned for keyword in tool_keywords):
         return False
