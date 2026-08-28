@@ -29,11 +29,11 @@ def test_apps_quit():
 
 def test_windows_snap_left():
     res = windows.snap_left()
-    assert "snap left" in res.lower()
+    assert "left" in res.lower()
 
 def test_windows_snap_right():
     res = windows.snap_right()
-    assert "snap right" in res.lower()
+    assert "right" in res.lower()
 
 def test_vault_append():
     res = vault.append("Test note")

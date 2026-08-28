@@ -20,6 +20,7 @@ from mynah.router.rules import RuleRouter
 from mynah.memory.context import get_active_context
 from mynah.router.brain import route_local_tool, route_cloud_fallback, assess_confidence
 import mynah.safety.gate as gate
+from mynah.tts.say import TextToSpeech
 
 def setup_registry() -> ToolRegistry:
     """Creates the tool registry and registers tools with strict risk labels and parameters."""
@@ -217,10 +218,10 @@ def is_question_pattern(text: str) -> bool:
         
     return True
 
-def route_and_execute(text: str, registry: ToolRegistry, router: RuleRouter) -> dict:
+def route_and_execute(text: str, registry: ToolRegistry, router: RuleRouter, tts: TextToSpeech = None) -> dict:
     """
     Executes the unified Mynah routing pipeline:
-    Question Check -> Tier 0 (Rules) -> Tier 1 (Local LLM) -> Tier 2 (Cloud Fallback) -> Gate -> Executor.
+    Question Check -> Tier 0 (Rules) -> Tier 1 (Local LLM) -> Tier 2 (Cloud Fallback) -> Gate -> Executor -> TTS -> Audit Log.
     """
     start_time = time.time()
     
@@ -242,7 +243,7 @@ def route_and_execute(text: str, registry: ToolRegistry, router: RuleRouter) -> 
         "repeated": False
     }
 
-    # 1. Question Pattern Check (Fix 3)
+    # 1. Question Pattern Check
     if is_question_pattern(text):
         print("[TIER BYPASS] Question detected. Routing directly to Tier 2 Cloud.")
         context = get_active_context()
@@ -279,23 +280,24 @@ def route_and_execute(text: str, registry: ToolRegistry, router: RuleRouter) -> 
             context = get_active_context()
             
             # 3. Tier 1 Local LLM tool call
-            local_start = time.time()
             local_result = route_local_tool(text, context, registry)
             
-            # Check local confidence (Fix 8)
             if assess_confidence(local_result, registry):
                 turn_data["matched_tier"] = 1
                 turn_data["latency_route"] = time.time() - start_time
                 process_llm_result(local_result, turn_data, registry)
             else:
                 print("[TIER ESCALATION] Local model low confidence or missed. Escalating to Tier 2.")
-                # 4. Tier 2 Cloud escalation
                 cloud_result = route_cloud_fallback(text, context, registry)
                 turn_data["matched_tier"] = 2
                 turn_data["latency_route"] = time.time() - start_time
                 process_llm_result(cloud_result, turn_data, registry)
 
-    # 5. Log every single turn to SQLite (Fix 12)
+    # Speak response if TTS wrapper is provided
+    if tts and turn_data.get("result"):
+        tts.speak(turn_data["result"])
+
+    # Log turn to SQLite audit DB
     log_turn(turn_data)
     return turn_data
 
@@ -303,9 +305,7 @@ def process_llm_result(result: dict, turn_data: dict, registry: ToolRegistry):
     """Executes the tool or returns direct spoken text based on LLM outputs."""
     import json
     
-    # Spend costing record
     turn_data["cost_usd"] = result.get("cost_usd", 0.0)
-    
     r_type = result.get("type")
     
     if r_type == "tool":
@@ -315,7 +315,6 @@ def process_llm_result(result: dict, turn_data: dict, registry: ToolRegistry):
         turn_data["args"] = json.dumps(args)
         
         exec_start = time.time()
-        # Verify Safety Gate (Fix 1)
         if gate.check(registry, tool_name, args):
             turn_data["confirmed"] = True
             try:
@@ -331,30 +330,30 @@ def process_llm_result(result: dict, turn_data: dict, registry: ToolRegistry):
         turn_data["result"] = result["content"]
         
     elif r_type == "refusal":
-        # Budget limit refusal logged cleanly (Fix 11)
         turn_data["result"] = f"Aborted: {result['content']}"
         print(f"Mynah: {result['content']}")
         
     else:
-        # Error
         turn_data["result"] = result.get("content", "Unknown routing error.")
 
 def main():
     parser = argparse.ArgumentParser(description="Mynah Voice Assistant Shell")
     parser.add_argument("--mock-text", type=str, help="Simulate a spoken command")
     parser.add_argument("--interactive", action="store_true", help="Start an interactive console session")
+    parser.add_argument("--listen", action="store_true", help="Start live microphone listening loop")
     args = parser.parse_args()
 
     # Initialize Audit Database
     init_db()
     
-    # Initialize Registry and Router
+    # Initialize Registry, Router, and TTS
     registry = setup_registry()
     router = RuleRouter()
+    tts = TextToSpeech()
 
     if args.mock_text:
         print(f"Routing mock command: '{args.mock_text}'")
-        turn = route_and_execute(args.mock_text, registry, router)
+        turn = route_and_execute(args.mock_text, registry, router, tts)
         print(f"Result: {turn['result']}")
     elif args.interactive:
         print("Mynah Interactive Shell. Type a command or 'exit' to quit.")
@@ -365,11 +364,43 @@ def main():
                     break
                 if not cmd:
                     continue
-                turn = route_and_execute(cmd, registry, router)
+                turn = route_and_execute(cmd, registry, router, tts)
                 print(f"Response: {turn['result']}")
             except KeyboardInterrupt:
                 break
         print("\nExited Mynah Interactive Shell.")
+    elif args.listen:
+        from mynah.audio import AudioCaptureManager, WakeWordDetector
+        from mynah.stt import SpeechToText
+
+        print("Initializing Mynah Audio Capture & 'hey mynah' Wake Word Detector...")
+        capture = AudioCaptureManager()
+        wakeword = WakeWordDetector(target_phrase="hey mynah")
+        stt = SpeechToText()
+
+        capture.start()
+        print("Listening for wake phrase ('hey mynah'). Press Ctrl+C to stop.")
+        try:
+            while True:
+                time.sleep(0.1)
+                chunk = capture.ring_buffer.get_last_n_seconds(0.5)
+                if len(chunk) > 0 and wakeword.process_chunk(chunk):
+                    print("\n[WAKE WORD DETECTED] Wake phrase activated ('hey mynah')!")
+                    tts.speak("Yes?")
+                    # Retrieve trailing audio & transcribe
+                    audio_segment = capture.ring_buffer.get_last_n_seconds(3.0)
+                    text, stt_latency = stt.transcribe(audio_segment)
+                    if text:
+                        print(f"Transcribed: '{text}' (STT latency: {stt_latency:.2f}s)")
+                        turn = route_and_execute(text, registry, router, tts)
+                        turn["latency_stt"] = stt_latency
+                        print(f"Response: {turn['result']}")
+                    else:
+                        print("No speech recognized.")
+                    capture.ring_buffer.clear()
+        except KeyboardInterrupt:
+            capture.stop()
+            print("\nMynah stopped by user.")
     else:
         parser.print_help()
 

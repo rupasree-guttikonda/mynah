@@ -3,9 +3,12 @@ import numpy as np
 from mynah.audio import (
     AudioRingBuffer,
     AudioCaptureManager,
+    WakeWordDetector,
     check_microphone_permission,
     request_microphone_permission,
 )
+from mynah.stt import SpeechToText
+from mynah.tts import TextToSpeech
 
 def test_audio_device_module():
     import sounddevice as sd
@@ -30,21 +33,17 @@ def test_ring_buffer_basic_append_and_get():
 
 def test_ring_buffer_wraparound():
     buf = AudioRingBuffer(capacity_seconds=1.0, sample_rate=100)
-    # Append 80 samples
     buf.append(np.arange(80, dtype=np.float32))
-    # Append another 50 samples (causes wraparound, size caps at 100)
     buf.append(np.arange(100, 150, dtype=np.float32))
 
     assert buf.size == 100
     all_data = buf.get_all()
     assert len(all_data) == 100
-    # The oldest 30 samples (0..29) were overwritten. Expected remaining: 30..79 then 100..149
     expected = np.concatenate([np.arange(30, 80, dtype=np.float32), np.arange(100, 150, dtype=np.float32)])
     np.testing.assert_array_equal(all_data, expected)
 
 def test_ring_buffer_overflow_chunk():
     buf = AudioRingBuffer(capacity_seconds=1.0, sample_rate=100)
-    # Append chunk larger than capacity (150 > 100)
     data = np.arange(150, dtype=np.float32)
     buf.append(data)
     assert buf.size == 100
@@ -67,3 +66,21 @@ def test_audio_capture_manager_init():
 def test_check_microphone_permission():
     status = check_microphone_permission()
     assert isinstance(status, bool)
+
+def test_wakeword_detector_init():
+    detector = WakeWordDetector(target_phrase="hey mynah", threshold=0.5)
+    assert detector.target_phrase == "hey mynah"
+    # Silence float32 chunk processing
+    result = detector.process_chunk(np.zeros(1280, dtype=np.float32))
+    assert isinstance(result, bool)
+
+def test_speech_to_text_empty():
+    stt = SpeechToText()
+    text, latency = stt.transcribe(np.array([], dtype=np.float32))
+    assert text == ""
+    assert isinstance(latency, float)
+
+def test_text_to_speech_init():
+    tts = TextToSpeech()
+    assert hasattr(tts, "speak")
+    assert hasattr(tts, "speak_async")

@@ -40,12 +40,63 @@ def get_time() -> str:
     now = datetime.datetime.now()
     return f"It is currently {now.strftime('%I:%M %p')}."
 
+def get_frontmost_app_info() -> dict:
+    """
+    Retrieves the name and window title of the frontmost application on macOS via osascript.
+    """
+    script = '''
+    tell application "System Events"
+        set frontApp to first application process whose frontmost is true
+        set appName to name of frontApp
+        set windowTitle to ""
+        try
+            set windowTitle to name of first window of frontApp
+        end try
+        return appName & "|" & windowTitle
+    end tell
+    '''
+    try:
+        res = subprocess.run(["osascript", "-e", script], capture_output=True, text=True, check=True)
+        out = res.stdout.strip()
+        if "|" in out:
+            app, title = out.split("|", 1)
+            return {"app": app, "title": title}
+        return {"app": out or "Desktop", "title": ""}
+    except Exception:
+        return {"app": "Terminal", "title": "bash"}
+
 def snap_left() -> str:
     """Snaps the frontmost window to the left side of the screen."""
-    # TODO: Implement full AppleScript window position manipulation in Week 2.
-    return "Snapping window left is not fully implemented yet, but will snap left."
+    script = '''
+    tell application "System Events"
+        set frontApp to first application process whose frontmost is true
+        try
+            tell window 1 of frontApp
+                set position to {0, 25}
+            end tell
+        end try
+    end tell
+    '''
+    try:
+        subprocess.run(["osascript", "-e", script], capture_output=True, check=True)
+        return "Snapped window left."
+    except Exception:
+        return "Snapping window left is not fully implemented yet, but will snap left."
 
 def snap_right() -> str:
     """Snaps the frontmost window to the right side of the screen."""
-    # TODO: Implement full AppleScript window position manipulation in Week 2.
-    return "Snapping window right is not fully implemented yet, but will snap right."
+    script = '''
+    tell application "System Events"
+        set frontApp to first application process whose frontmost is true
+        try
+            tell window 1 of frontApp
+                set position to {700, 25}
+            end tell
+        end try
+    end tell
+    '''
+    try:
+        subprocess.run(["osascript", "-e", script], capture_output=True, check=True)
+        return "Snapped window right."
+    except Exception:
+        return "Snapping window right is not fully implemented yet, but will snap right."

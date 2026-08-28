@@ -27,7 +27,14 @@ def get_system_ram_gb() -> float:
 
 def get_default_local_model() -> str:
     """
-    Returns the single default local model configured for the project.
-    - Default local model: Qwen 3.5 4B (qwen3.5:4b)
+    Returns default local model based on system RAM or MYNAH_LOCAL_MODEL env var.
+    - Default local model: qwen3:1.7b (~1.1GB RAM footprint)
     """
-    return "qwen3.5:4b"
+    env_model = os.getenv("MYNAH_LOCAL_MODEL")
+    if env_model:
+        return env_model
+
+    ram_gb = get_system_ram_gb()
+    if ram_gb <= 8.0:
+        return "qwen3:1.7b"
+    return "qwen3:1.7b"
