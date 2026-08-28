@@ -28,6 +28,15 @@ class SpeechToText:
         """
         self.model_name = model_name
 
+    def warmup(self) -> None:
+        """Pre-warm MLX Whisper model on a short dummy array to avoid first-run compilation lag."""
+        if HAS_MLX_WHISPER:
+            try:
+                dummy = np.zeros(16000, dtype=np.float32)
+                mlx_whisper.transcribe(dummy, path_or_hf_repo=self.model_name)
+            except Exception:
+                pass
+
     def transcribe(self, float32_samples: np.ndarray, language: Optional[str] = None) -> Tuple[str, float]:
         """
         Transcribe 1D float32 PCM audio array into text.

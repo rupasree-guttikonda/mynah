@@ -78,8 +78,6 @@ class WakeWordDetector:
 
         for model_name, score in predictions.items():
             if score >= self.threshold:
-                if hasattr(self.model, "reset"):
-                    self.model.reset()
                 return True
 
         return False

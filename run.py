@@ -445,6 +445,7 @@ def main():
         print("Initializing Mynah Audio Capture & 'hey mynah' Wake Word Detector...")
         wakeword = WakeWordDetector(target_phrase="hey mynah")
         stt = SpeechToText()
+        stt.warmup()
 
         wake_detected = threading.Event()
         listening_for_command = threading.Event()
@@ -464,9 +465,11 @@ def main():
                     listening_for_command.set()
                     print("\n[WAKE WORD DETECTED] Wake phrase activated ('hey mynah')!")
                     tts.speak("Yes?")
+                    time.sleep(0.5)
                     
-                    # Capture the next 3.5 seconds of user speech
-                    print("Listening to your command...")
+                    # Capture user speech cleanly
+                    capture.ring_buffer.clear()
+                    print("Listening to your command (speak now)...")
                     time.sleep(3.5)
                     audio_segment = capture.ring_buffer.get_last_n_seconds(3.5)
                     
@@ -481,6 +484,7 @@ def main():
                     
                     capture.ring_buffer.clear()
                     listening_for_command.clear()
+                    print("\nListening for wake phrase ('hey mynah')...")
         except KeyboardInterrupt:
             capture.stop()
             print("\nMynah stopped by user.")
