@@ -9,6 +9,7 @@ import argparse
 import time
 import datetime
 import threading
+import numpy as np
 
 from mynah.log.audit import init_db, log_turn
 from mynah.tools.base import ToolRegistry
