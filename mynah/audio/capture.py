@@ -141,9 +141,18 @@ class AudioCaptureManager:
     continuously into an AudioRingBuffer.
     """
 
-    def __init__(self, sample_rate: int = 16000, channels: int = 1, capacity_seconds: float = 5.0):
+    def __init__(
+        self,
+        sample_rate: int = 16000,
+        channels: int = 1,
+        capacity_seconds: float = 5.0,
+        blocksize: int = 1280,
+        chunk_callback=None,
+    ):
         self.sample_rate = sample_rate
         self.channels = channels
+        self.blocksize = blocksize
+        self.chunk_callback = chunk_callback
         self.ring_buffer = AudioRingBuffer(capacity_seconds=capacity_seconds, sample_rate=sample_rate)
         self.stream = None
         self._is_active = False
@@ -151,6 +160,11 @@ class AudioCaptureManager:
     def _audio_callback(self, indata: np.ndarray, frames: int, time_info: dict, status: sd.CallbackFlags):
         samples = indata[:, 0].copy()
         self.ring_buffer.append(samples)
+        if self.chunk_callback:
+            try:
+                self.chunk_callback(samples)
+            except Exception:
+                pass
 
     def start(self) -> None:
         if self._is_active:
@@ -159,6 +173,7 @@ class AudioCaptureManager:
             samplerate=self.sample_rate,
             channels=self.channels,
             dtype="float32",
+            blocksize=self.blocksize,
             callback=self._audio_callback,
         )
         self.stream.start()

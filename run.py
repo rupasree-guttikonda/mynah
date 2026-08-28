@@ -441,30 +441,44 @@ def main():
         from mynah.stt import SpeechToText
 
         print("Initializing Mynah Audio Capture & 'hey mynah' Wake Word Detector...")
-        capture = AudioCaptureManager()
         wakeword = WakeWordDetector(target_phrase="hey mynah")
         stt = SpeechToText()
 
+        wake_detected = threading.Event()
+        listening_for_command = threading.Event()
+
+        def on_chunk(samples: np.ndarray):
+            if not listening_for_command.is_set():
+                if wakeword.process_chunk(samples):
+                    wake_detected.set()
+
+        capture = AudioCaptureManager(blocksize=1280, chunk_callback=on_chunk)
         capture.start()
-        print("Listening for wake phrase ('hey mynah'). Press Ctrl+C to stop.")
+        print(f"Listening for wake phrase ('hey mynah') [Sensitivity: {wakeword.threshold:.2f}]. Press Ctrl+C to stop.")
         try:
             while True:
-                time.sleep(0.1)
-                chunk = capture.ring_buffer.get_last_n_seconds(0.5)
-                if len(chunk) > 0 and wakeword.process_chunk(chunk):
+                if wake_detected.wait(timeout=0.1):
+                    wake_detected.clear()
+                    listening_for_command.set()
                     print("\n[WAKE WORD DETECTED] Wake phrase activated ('hey mynah')!")
                     tts.speak("Yes?")
-                    # Retrieve trailing audio & transcribe
-                    audio_segment = capture.ring_buffer.get_last_n_seconds(3.0)
+                    
+                    # Capture the next 3.5 seconds of user speech
+                    print("Listening to your command...")
+                    time.sleep(3.5)
+                    audio_segment = capture.ring_buffer.get_last_n_seconds(3.5)
+                    
                     text, stt_latency = stt.transcribe(audio_segment)
-                    if text:
+                    if text and text.strip():
                         print(f"Transcribed: '{text}' (STT latency: {stt_latency:.2f}s)")
                         turn = route_and_execute(text, registry, router, tts)
                         turn["latency_stt"] = stt_latency
                         print(f"Response: {turn['result']}")
                     else:
-                        print("No speech recognized.")
+                        print("No command speech recognized.")
+                    
                     capture.ring_buffer.clear()
+                    listening_for_command.clear()
         except KeyboardInterrupt:
             capture.stop()
             print("\nMynah stopped by user.")
