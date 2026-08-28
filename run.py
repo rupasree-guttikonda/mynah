@@ -341,6 +341,8 @@ def main():
     parser.add_argument("--mock-text", type=str, help="Simulate a spoken command")
     parser.add_argument("--interactive", action="store_true", help="Start an interactive console session")
     parser.add_argument("--listen", action="store_true", help="Start live microphone listening loop")
+    parser.add_argument("--compact", type=str, nargs="?", const="today", help="Run compaction for date (YYYY-MM-DD), default is today")
+    parser.add_argument("--register-cron", action="store_true", help="Register nightly launchd compaction job")
     args = parser.parse_args()
 
     # Initialize Audit Database
@@ -351,7 +353,19 @@ def main():
     router = RuleRouter()
     tts = TextToSpeech()
 
-    if args.mock_text:
+    if args.compact:
+        date_str = args.compact
+        if date_str == "today":
+            date_str = datetime.datetime.now().strftime("%Y-%m-%d")
+        from mynah.memory.compaction import compact_daily_log
+        print(f"Running daily note compaction for {date_str}...")
+        result = compact_daily_log(date_str)
+        print(result)
+    elif args.register_cron:
+        from mynah.scheduler.launchd import register_compaction_job
+        result = register_compaction_job()
+        print(result)
+    elif args.mock_text:
         print(f"Routing mock command: '{args.mock_text}'")
         turn = route_and_execute(args.mock_text, registry, router, tts)
         print(f"Result: {turn['result']}")

@@ -26,6 +26,7 @@ def get_system_ram_gb() -> float:
         return 16.0
 
 def get_default_local_model() -> str:
+    """
     Returns default local model based on system RAM or MYNAH_LOCAL_MODEL env var.
     - <= 8.5 GB RAM: qwen3:1.7b
     - > 8.5 GB RAM: qwen3.5:4b
