@@ -42,12 +42,20 @@ def check_daily_budget(db_path: str = "audit.db", max_usd: float = 1.00) -> Tupl
     """
     Queries SQLite audit turns table to sum today's cloud API cost in USD.
     Returns (within_budget: bool, current_total_usd: float).
+    Fails CLOSED: any unexpected error querying the database blocks spending
+    rather than silently permitting it, since this is a financial safety guardrail.
+    A missing database/table (genuine first run, nothing spent yet) is the
+    one case still treated as "within budget."
     """
+    import os
+
+    if not os.path.exists(db_path):
+        return True, 0.0
+
     try:
         conn = sqlite3.connect(db_path)
         cursor = conn.cursor()
 
-        # Query total USD cost logged today
         today_str = datetime.datetime.now().strftime("%Y-%m-%d")
         cursor.execute(
             """
@@ -62,6 +70,9 @@ def check_daily_budget(db_path: str = "audit.db", max_usd: float = 1.00) -> Tupl
 
         within_budget = current_cost < max_usd
         return within_budget, current_cost
+    except sqlite3.OperationalError as e:
+        if "no such table" in str(e).lower():
+            return True, 0.0
+        return False, max_usd
     except Exception:
-        # If DB query fails or table doesn't exist yet, permit execution
-        return True, 0.0
+        return False, max_usd
