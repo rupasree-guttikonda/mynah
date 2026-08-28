@@ -9,12 +9,14 @@ import asyncio
 import queue
 import threading
 
+from mynah.config import MYNAH_TTS_VOICE, MYNAH_TTS_RATE
+
 class TextToSpeech:
     """
     Non-blocking and synchronous wrappers around macOS native 'say' command with streaming queue.
     """
 
-    def __init__(self, voice: str = "Samantha", rate: int = 185):
+    def __init__(self, voice: str = MYNAH_TTS_VOICE, rate: int = MYNAH_TTS_RATE):
         self.voice = voice
         self.rate = rate
         self.speech_queue = queue.Queue()

@@ -40,3 +40,7 @@ def get_default_local_model() -> str:
         return "qwen3:1.7b"
     else:
         return "qwen3.5:4b"
+
+# TTS configuration (e.g. Samantha, Sandy, Shelley, or system voice name)
+MYNAH_TTS_VOICE = os.getenv("MYNAH_TTS_VOICE", "Samantha")
+MYNAH_TTS_RATE = int(os.getenv("MYNAH_TTS_RATE", "185"))
