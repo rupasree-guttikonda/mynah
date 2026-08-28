@@ -23,3 +23,8 @@ models/
 # Personal Vault files (to prevent leaking personal notes)
 vault/
 quarantine/
+
+# Notebooks & temporary datasets
+*.ipynb
+*.npy
+
