@@ -46,4 +46,4 @@ MYNAH_TTS_VOICE = os.getenv("MYNAH_TTS_VOICE", "Samantha")
 MYNAH_TTS_RATE = int(os.getenv("MYNAH_TTS_RATE", "185"))
 
 # Wake word sensitivity threshold (lower = higher recall/easier detection)
-MYNAH_WAKEWORD_THRESHOLD = float(os.getenv("MYNAH_WAKEWORD_THRESHOLD", "0.35"))
+MYNAH_WAKEWORD_THRESHOLD = float(os.getenv("MYNAH_WAKEWORD_THRESHOLD", "0.20"))
