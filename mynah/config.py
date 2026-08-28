@@ -26,11 +26,14 @@ def get_system_ram_gb() -> float:
         return 16.0
 
 def get_default_local_model() -> str:
-    """
-    Selects default local model based on total detected system RAM.
+    Returns default local model based on system RAM or MYNAH_LOCAL_MODEL env var.
     - <= 8.5 GB RAM: qwen3:1.7b
     - > 8.5 GB RAM: qwen3.5:4b
     """
+    env_model = os.getenv("MYNAH_LOCAL_MODEL")
+    if env_model:
+        return env_model
+
     ram_gb = get_system_ram_gb()
     if ram_gb <= 8.5:
         return "qwen3:1.7b"

@@ -100,11 +100,21 @@ class TestConfig(unittest.TestCase):
         ram = get_system_ram_gb()
         self.assertGreater(ram, 0.0)
         
-        model = get_default_local_model()
-        if ram <= 8.5:
-            self.assertEqual(model, "qwen3:1.7b")
-        else:
-            self.assertEqual(model, "qwen3.5:4b")
+        # Test default local model without environment overrides
+        import os
+        original_env = os.environ.get("MYNAH_LOCAL_MODEL")
+        if "MYNAH_LOCAL_MODEL" in os.environ:
+            del os.environ["MYNAH_LOCAL_MODEL"]
+            
+        try:
+            model = get_default_local_model()
+            if ram <= 8.5:
+                self.assertEqual(model, "qwen3:1.7b")
+            else:
+                self.assertEqual(model, "qwen3.5:4b")
+        finally:
+            if original_env is not None:
+                os.environ["MYNAH_LOCAL_MODEL"] = original_env
 
 if __name__ == "__main__":
     unittest.main()

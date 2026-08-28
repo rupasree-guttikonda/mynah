@@ -8,6 +8,8 @@ import tempfile
 import mynah.router.brain as brain
 from mynah.tools.base import ToolRegistry
 from mynah.memory.context import count_tokens, get_profile_context, get_recent_history
+from mynah.log.metrics import check_daily_budget, count_tokens as metrics_count_tokens
+from mynah.router.benchmark import benchmark_ollama
 
 class TestBrainRouter(unittest.TestCase):
     def setUp(self):
@@ -62,6 +64,16 @@ class TestBrainRouter(unittest.TestCase):
         self.assertIn("Daily spend limit reached", res["content"])
         mock_client.assert_not_called()
 
+    def test_check_daily_budget_helper(self):
+        within, cost = check_daily_budget("nonexistent.db", max_usd=1.00)
+        self.assertTrue(within)
+        self.assertEqual(cost, 0.0)
+
+    def test_benchmark_ollama_structure(self):
+        res = benchmark_ollama(model_name="nonexistent-test-model")
+        self.assertIn("system_ram_gb", res)
+        self.assertIn("latency_sec", res)
+
 class TestContextInjection(unittest.TestCase):
     def setUp(self):
         self.temp_vault = tempfile.mkdtemp()
@@ -84,21 +96,19 @@ class TestContextInjection(unittest.TestCase):
 
     def test_token_counting(self):
         self.assertEqual(count_tokens("hello world"), 2)
+        self.assertEqual(metrics_count_tokens("hello world"), 2)
 
     def test_get_profile_context_capping(self):
-        # Create a large profile file
         me_dir = os.path.join(self.temp_vault, "me")
         os.makedirs(me_dir, exist_ok=True)
         
-        # Write massive text to identity.md
         large_text = "word " * 1000
         with open(os.path.join(me_dir, "identity.md"), "w") as f:
             f.write(large_text)
             
         context_str = get_profile_context()
-        # Verify it has been capped and warning/truncation indicator added
         self.assertIn("[... Context Truncated ...]", context_str)
-        self.assertLessEqual(count_tokens(context_str), 520) # 500 + suffix tokens
+        self.assertLessEqual(count_tokens(context_str), 520)
 
 if __name__ == "__main__":
     unittest.main()

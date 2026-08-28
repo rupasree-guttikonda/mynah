@@ -74,34 +74,74 @@ def search(query: str) -> str:
     """
     Searches all markdown files in the vault (excluding quarantine) for the query,
     ranking matching files by recency (modification time).
+    Uses ripgrep (rg) if installed, with a Python fallback.
     """
     matches = []
     
-    # Traverse vault directory
-    for root, dirs, files in os.walk(VAULT_DIR):
-        # Exclude quarantine boundary files completely from search results
-        if "quarantine" in root:
-            continue
-        for file in files:
-            if file.endswith(".md"):
-                file_path = os.path.join(root, file)
-                try:
-                    with open(file_path, "r", encoding="utf-8") as f:
-                        lines = f.readlines()
-                    matching_lines = []
-                    for line_num, line in enumerate(lines, 1):
-                        if query.lower() in line.lower():
-                            matching_lines.append(f"Line {line_num}: {line.strip()}")
-                    if matching_lines:
-                        mtime = os.path.getmtime(file_path)
-                        matches.append({
-                            "file": os.path.relpath(file_path, VAULT_DIR),
-                            "mtime": mtime,
-                            "snippets": matching_lines[:3] # top 3 matching snippets
-                        })
-                except Exception:
-                    continue
-                    
+    if not os.path.exists(VAULT_DIR):
+        return f"No matches found for search query: '{query}'"
+
+    # Try ripgrep integration first
+    import subprocess
+    import shutil
+    
+    rg_path = shutil.which("rg")
+    if rg_path:
+        try:
+            cmd = [
+                rg_path,
+                "-i",               # case-insensitive
+                "-n",               # line numbers
+                "--glob", "!quarantine/**",  # exclude quarantine
+                query,
+                VAULT_DIR
+            ]
+            res = subprocess.run(cmd, capture_output=True, text=True)
+            if res.returncode in (0, 1) and res.stdout.strip():
+                file_map = {}
+                for line in res.stdout.strip().splitlines():
+                    parts = line.split(":", 2)
+                    if len(parts) == 3:
+                        f_path, l_num, content = parts[0], parts[1], parts[2]
+                        if f_path not in file_map:
+                            file_map[f_path] = []
+                        file_map[f_path].append(f"Line {l_num}: {content.strip()}")
+                
+                for f_path, snippets in file_map.items():
+                    mtime = os.path.getmtime(f_path)
+                    matches.append({
+                        "file": os.path.relpath(f_path, VAULT_DIR),
+                        "mtime": mtime,
+                        "snippets": snippets[:3]
+                    })
+        except Exception:
+            matches = []
+
+    # Fallback to Python file walk if ripgrep was not available or found no results
+    if not matches:
+        for root, dirs, files in os.walk(VAULT_DIR):
+            if "quarantine" in root:
+                continue
+            for file in files:
+                if file.endswith(".md"):
+                    file_path = os.path.join(root, file)
+                    try:
+                        with open(file_path, "r", encoding="utf-8") as f:
+                            lines = f.readlines()
+                        matching_lines = []
+                        for line_num, line in enumerate(lines, 1):
+                            if query.lower() in line.lower():
+                                matching_lines.append(f"Line {line_num}: {line.strip()}")
+                        if matching_lines:
+                            mtime = os.path.getmtime(file_path)
+                            matches.append({
+                                "file": os.path.relpath(file_path, VAULT_DIR),
+                                "mtime": mtime,
+                                "snippets": matching_lines[:3]
+                            })
+                    except Exception:
+                        continue
+                        
     if not matches:
         return f"No matches found for search query: '{query}'"
         
