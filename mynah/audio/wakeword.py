@@ -9,6 +9,8 @@ import glob
 import numpy as np
 from typing import List, Optional, Union
 
+from mynah.config import MYNAH_WAKEWORD_THRESHOLD
+
 try:
     import openwakeword
     from openwakeword.model import Model
@@ -28,7 +30,7 @@ class WakeWordDetector:
         self,
         target_phrase: Optional[Union[str, List[str]]] = None,
         target_phrases: Optional[List[str]] = None,
-        threshold: float = 0.45,
+        threshold: float = MYNAH_WAKEWORD_THRESHOLD,
         custom_model_dir: str = "models/wakeword",
         sample_rate: int = 16000,
     ):

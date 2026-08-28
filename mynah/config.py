@@ -44,3 +44,6 @@ def get_default_local_model() -> str:
 # TTS configuration (e.g. Samantha, Sandy, Shelley, or system voice name)
 MYNAH_TTS_VOICE = os.getenv("MYNAH_TTS_VOICE", "Samantha")
 MYNAH_TTS_RATE = int(os.getenv("MYNAH_TTS_RATE", "185"))
+
+# Wake word sensitivity threshold (lower = higher recall/easier detection)
+MYNAH_WAKEWORD_THRESHOLD = float(os.getenv("MYNAH_WAKEWORD_THRESHOLD", "0.35"))
