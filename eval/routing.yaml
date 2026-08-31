@@ -1,0 +1,317 @@
+# eval/routing.yaml
+# Mynah router evaluation set - 60+ examples to verify tier mapping and tool correctness
+
+- text: "open safari"
+  tier: 0
+  tool: "apps.launch"
+  args:
+    name: "Safari"
+
+- text: "open Calculator"
+  tier: 0
+  tool: "apps.launch"
+  args:
+    name: "Calculator"
+
+- text: "quit Slack"
+  tier: 0
+  tool: "apps.quit"
+  args:
+    name: "Slack"
+
+- text: "remember that I need to buy milk"
+  tier: 0
+  tool: "vault.append"
+  args:
+    text: "I need to buy milk"
+
+- text: "note that the deployment was successful"
+  tier: 0
+  tool: "vault.append"
+  args:
+    text: "the deployment was successful"
+
+- text: "mute system sound"
+  tier: 0
+  tool: "windows.mute"
+
+- text: "unmute"
+  tier: 0
+  tool: "windows.unmute"
+
+- text: "what time is it"
+  tier: 0
+  tool: "windows.get_time"
+
+- text: "set volume to 50"
+  tier: 0
+  tool: "windows.set_volume"
+  args:
+    level: 50
+
+- text: "snap this window left"
+  tier: 0
+  tool: "windows.snap_left"
+
+- text: "snap it right"
+  tier: 0
+  tool: "windows.snap_right"
+
+- text: "can you launch the safari browser please?"
+  tier: 1
+  tool: "apps.launch"
+  args:
+    name: "Safari"
+
+- text: "please shut down calculator"
+  tier: 1
+  tool: "apps.quit"
+  args:
+    name: "Calculator"
+
+- text: "adjust output volume level to eighty-five percent"
+  tier: 1
+  tool: "windows.set_volume"
+  args:
+    level: 85
+
+- text: "silence system audio output"
+  tier: 1
+  tool: "windows.mute"
+
+- text: "turn on the sound again"
+  tier: 1
+  tool: "windows.unmute"
+
+- text: "what is the current time of day?"
+  tier: 1
+  tool: "windows.get_time"
+
+- text: "move the current app window to the left boundary"
+  tier: 1
+  tool: "windows.snap_left"
+
+- text: "dock this application on the right side of the screen"
+  tier: 1
+  tool: "windows.snap_right"
+
+- text: "save a memo saying that the key is stored in vault"
+  tier: 1
+  tool: "vault.append"
+  args:
+    text: "the key is stored in vault"
+
+- text: "search vault for data engineering project notes"
+  tier: 1
+  tool: "vault.search"
+  args:
+    query: "data engineering"
+
+- text: "find notes containing SQLite turns logger"
+  tier: 1
+  tool: "vault.search"
+  args:
+    query: "SQLite turns logger"
+
+- text: "delete my critical file at /Users/avr/temp.txt"
+  tier: 1
+  tool: "systems.delete_file"
+  args:
+    path: "/Users/avr/temp.txt"
+
+- text: "permanently remove the data log at /tmp/audit.log"
+  tier: 1
+  tool: "systems.delete_file"
+  args:
+    path: "/tmp/audit.log"
+
+- text: "what is the capital of the united kingdom?"
+  tier: 2
+  tool: null
+
+- text: "why is my python script getting shadowing errors?"
+  tier: 2
+  tool: null
+
+- text: "how does openwakeword detect custom phrases?"
+  tier: 2
+  tool: null
+
+- text: "who wrote the first computer compiler?"
+  tier: 2
+  tool: null
+
+- text: "explain the difference between postgreSQL and sqlite"
+  tier: 2
+  tool: null
+
+- text: "when was the macbook air m3 released?"
+  tier: 2
+  tool: null
+
+- text: "tell me a funny programming joke"
+  tier: 2
+  tool: null
+
+- text: "send it"
+  tier: 2
+  tool: null
+
+- text: "close this"
+  tier: 1
+  tool: "apps.quit"
+  args:
+    name: "ActiveApp"
+
+- text: "note that snowflake is down"
+  tier: 0
+  tool: "vault.append"
+  args:
+    text: "snowflake is down"
+
+- text: "what's my calendar look like"
+  tier: 1
+  tool: "vault.search"
+  args:
+    query: "calendar"
+
+- text: "can you explain what I wrote yesterday"
+  tier: 1
+  tool: "vault.search"
+  args:
+    query: "yesterday"
+
+- text: "delete that last note"
+  tier: 1
+  tool: "systems.delete_file"
+  args:
+    path: "last_note"
+
+- text: "what is key for my cloud storage"
+  tier: 1
+  tool: "keychain.get_secret"
+  args:
+    service: "cloud_storage"
+    account: "default"
+
+- text: "get the password for gitlab"
+  tier: 1
+  tool: "keychain.get_secret"
+  args:
+    service: "gitlab"
+    account: "default"
+
+- text: "save gitlab token 12345 in keychain"
+  tier: 1
+  tool: "keychain.set_secret"
+  args:
+    service: "gitlab"
+    account: "default"
+    secret: "12345"
+
+- text: "save my library card number 9876 in keychain"
+  tier: 1
+  tool: "keychain.set_secret"
+  args:
+    service: "library_card"
+    account: "default"
+    secret: "9876"
+
+- text: "retrieve my library card from keychain"
+  tier: 1
+  tool: "keychain.get_secret"
+  args:
+    service: "library_card"
+    account: "default"
+
+- text: "show my preferred meeting length"
+  tier: 1
+  tool: "vault.search"
+  args:
+    query: "preferred meeting length"
+
+- text: "remember my preferred meeting length is 30 minutes"
+  tier: 0
+  tool: "vault.append"
+  args:
+    text: "my preferred meeting length is 30 minutes"
+
+- text: "minimize the active safari window"
+  tier: 1
+  tool: "apps.quit"
+  args:
+    name: "Safari"
+
+- text: "how do I run docker on macbook m3"
+  tier: 2
+  tool: null
+
+- text: "why is my zsh command not found"
+  tier: 2
+  tool: null
+
+- text: "who is the author of mynah"
+  tier: 2
+  tool: null
+
+- text: "explain python decorators in 2 sentences"
+  tier: 2
+  tool: null
+
+- text: "when did python 3.12 release"
+  tier: 2
+  tool: null
+
+- text: "launch the terminal app"
+  tier: 1
+  tool: "apps.launch"
+  args:
+    name: "Terminal"
+
+- text: "terminate safari browser"
+  tier: 1
+  tool: "apps.quit"
+  args:
+    name: "Safari"
+
+- text: "please quiet down the system output"
+  tier: 1
+  tool: "windows.mute"
+
+- text: "raise the volume slightly"
+  tier: 1
+  tool: "windows.set_volume"
+  args:
+    level: 10
+
+- text: "tell me what's the weather in Seattle"
+  tier: 2
+  tool: null
+
+- text: "write a python function to merge dicts"
+  tier: 2
+  tool: null
+
+- text: "search my notes for security guidelines"
+  tier: 1
+  tool: "vault.search"
+  args:
+    query: "security guidelines"
+
+- text: "find all files with extension txt"
+  tier: 1
+  tool: "vault.search"
+  args:
+    query: "extension txt"
+
+- text: "how do i configure launchd on mac"
+  tier: 2
+  tool: null
+
+- text: "what is the port for ollama server"
+  tier: 2
+  tool: null
+
+- text: "what is the path to default vault"
+  tier: 2
+  tool: null

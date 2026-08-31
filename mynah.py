@@ -1,18 +1,9 @@
 #!/usr/bin/env python3
 """
-Mynah Voice Assistant - Main process thread loop.
+Mynah Voice Assistant - Entry point wrapper.
 """
 
-import asyncio
-import sys
+from run import main
 
-async def main():
-    print("Initializing Mynah Voice Assistant...")
-    # TODO: Implement main process loop
-    
 if __name__ == "__main__":
-    try:
-        asyncio.run(main())
-    except KeyboardInterrupt:
-        print("\nMynah stopped by user.")
-        sys.exit(0)
+    main()

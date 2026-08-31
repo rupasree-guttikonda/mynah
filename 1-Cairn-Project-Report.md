@@ -1,4 +1,4 @@
-# Mynah
+# Cairn
 
 **A local-first voice assistant with persistent memory, for macOS**
 
@@ -9,7 +9,7 @@ August 2026 · Vijay
 
 ## The name
 
-A mynah is a bird renowned for its incredible ability to mimic human speech, learn sounds, and interact dynamically.
+A cairn is a stack of stones travellers build one at a time to mark a trail. Each person who passes adds a stone. Over time it becomes something that guides everyone who comes after.
 
 That is what this system does. Every day you use it, it stores a little more about how you work, what you decided, and how you phrase things. The assistant that exists in month six is one you built by using it, not one you programmed.
 
@@ -29,7 +29,7 @@ Neither remembers. That is the actual gap. An assistant that forgets you between
 
 ---
 
-## 2. What Mynah is
+## 2. What Cairn is
 
 A background process on a Mac that listens for a wake word, understands what you asked, does it, and speaks back. It keeps a memory of you as plain markdown files you own and can read.
 
@@ -91,7 +91,7 @@ A background process on a Mac that listens for a wake word, understands what you
 | Screen-control agents | Impressive scope | Slow, unreliable, expensive per task, large security surface |
 | General agent runtimes | Mature tooling, community | Built for chat-latency, not sub-second voice reflex |
 | Dictation tools | Excellent at one job | Only transcribe; no understanding or action |
-| **Mynah** | Memory, local reasoning, near-zero cost, bounded reliability | Deliberately cannot control arbitrary GUI apps |
+| **Cairn** | Memory, local reasoning, near-zero cost, bounded reliability | Deliberately cannot control arbitrary GUI apps |
 
 The differentiator is not capability. It is that **the memory compounds and the marginal cost is zero**, which together mean the tool gets better and cheaper the more it is used. Every other option is static and metered.
 
@@ -115,7 +115,7 @@ The differentiator is not capability. It is that **the memory compounds and the 
 ### Accepted limitations
 - Applications with no scripting interface and no accessibility tree cannot be controlled. Roughly 10% of software, not worth solving.
 - The local model will be wrong about niche facts. Anything needing current information or deep reasoning escalates.
-- An 1.5B/3B model is reliable on single tool calls and shaky on multi-step chains. Design around single-step commands; let chains escalate.
+- An 8B model is reliable on single tool calls and shaky on multi-step chains. Design around single-step commands; let chains escalate.
 
 ---
 
@@ -150,9 +150,9 @@ Time is the real cost: roughly 80 hours to v1.0, spread over nine weeks of eveni
 
 ### Running
 
-Local requests cost nothing. With a 1.5B/3B model handling most reasoning, expect roughly 95% of requests to stay on-device.
+Local requests cost nothing. With an 8B model handling most reasoning, expect roughly 95% of requests to stay on-device.
 
-Rates as of August 2026: gpt-4o-mini at $0.15/$0.60 per million input/output tokens. Prompt caching cuts repeated input cost by 90%.
+Rates as of August 2026: Haiku 4.5 at $1/$5 per million input/output tokens, Sonnet 5 at $2/$10, Opus 5 at $5/$25. Prompt caching cuts repeated input cost by 90%.
 
 | Scenario | Cloud calls/day | Monthly |
 |---|---|---|

@@ -20,8 +20,8 @@ This document provides instructions for any AI assistant or agent working within
 * **Process Supervision:** Use standard plist setups for macOS launchd.
 * **Asynchronous Execution:** Use standard asyncio or threading loops for non-blocking speech recognition and audio ring buffers.
 * **Model Constraints:** 
-  * Local LLM routing runs on Qwen 8B (via Ollama/MLX) utilizing structured output (JSON mode or GBNF grammar templates).
-  * Cloud LLM runs on Anthropic Claude (Haiku for default, Sonnet for low confidence) with system prompt caching enabled.
+  * Local LLM routing runs on Qwen 2.5 1.5B (via Ollama) utilizing structured JSON outputs.
+  * Cloud LLM runs on OpenAI ChatGPT (gpt-4o-mini) with structured output and token caps enabled.
 
 ---
 
